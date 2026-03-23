@@ -49,11 +49,11 @@ export function proxy(request: NextRequest) {
   const token = request.cookies.get(DRIVER_AUTH_CONFIG.tokenKey)?.value;
   const user = getUserFromCookie(request);
 
-  const isPublicRoute = publicRoutes.some(route => pathname.startsWith(route));
-  const isAuthRoute = authRoutes.some(route => pathname.startsWith(route));
+  const isPublicRoute = publicRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`));
+  const isAuthRoute = authRoutes.some(route => pathname === route || pathname.startsWith(`${route}/`));
   const isAuthenticated = !!token && !!user && !isTokenExpired(token);
 
-  if (pathname === '/' || pathname === '/dashboard') {
+  if (pathname === '/') {
     if (isAuthenticated) {
       return NextResponse.redirect(new URL(FRONTEND_ROUTES.DASHBOARD, request.url));
     }
@@ -64,7 +64,7 @@ export function proxy(request: NextRequest) {
     return NextResponse.redirect(new URL(FRONTEND_ROUTES.DASHBOARD, request.url));
   }
 
-  if (!isPublicRoute && !isAuthenticated && pathname.startsWith('/driver')) {
+  if (!isPublicRoute && !isAuthenticated) {
     const loginUrl = new URL(FRONTEND_ROUTES.DRIVER_LOGIN, request.url);
     loginUrl.searchParams.set('redirect', pathname);
     return NextResponse.redirect(loginUrl);

@@ -99,7 +99,7 @@ export const API_CONFIG = {
 }
 
 export const FRONTEND_ROUTES = {
-    DASHBOARD: "/driver/dashboard",
+    DASHBOARD: "/dashboard",
     LOCATIONS: "/locations",
     LOCATIONS_NEW: "/locations/new",
     LOCATIONS_DETAILS: (id: string) => `/locations/${id}`,
@@ -113,15 +113,15 @@ export const FRONTEND_ROUTES = {
     WEBHOOKS: "/webhooks",
     WEBHOOKS_LOGS: (id: string) => `/webhooks/${id}/logs`,
     OCPI: "/ocpi",
-    VERIFY_EMAIL: "/driver/verify-email",
-    ACCEPT_INVITE: "/driver/accept-invitation",
-    DRIVER_LOGIN: "/driver/login",
-    DRIVER_REGISTER: "/driver/register",
-    DRIVER_DASHBOARD: "/driver/dashboard",
-    DRIVER_PROFILE: "/driver/profile",
-    DRIVER_CHARGING: "/driver/charging",
-    DRIVER_SESSIONS: "/driver/sessions",
-    DRIVER_PAYMENTS: "/driver/payments",
+    VERIFY_EMAIL: "/verify-email",
+    ACCEPT_INVITE: "/accept-invitation",
+    DRIVER_LOGIN: "/login",
+    DRIVER_REGISTER: "/register",
+    DRIVER_DASHBOARD: "/dashboard",
+    DRIVER_PROFILE: "/profile",
+    DRIVER_CHARGING: "/charging",
+    DRIVER_SESSIONS: "/sessions",
+    DRIVER_PAYMENTS: "/payments",
 }
 
 export const AUTH_CONFIG = {

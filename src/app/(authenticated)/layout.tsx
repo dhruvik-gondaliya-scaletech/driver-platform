@@ -1,6 +1,6 @@
 import { DriverSidebar } from '@/components/shared/DriverSidebar';
 
-export default function DriverLayout({
+export default function AuthenticatedLayout({
   children,
 }: {
   children: React.ReactNode;
