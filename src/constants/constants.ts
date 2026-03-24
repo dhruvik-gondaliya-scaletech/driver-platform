@@ -94,6 +94,17 @@ export const API_CONFIG = {
                 sessions: "/driver/v1/charging/sessions",
                 activeSession: "/driver/v1/charging/active-session",
             },
+            stations: {
+                base: "/driver/v1/stations",
+                byId: (id: string) => `/driver/v1/stations/${id}`,
+            },
+            locations: {
+                base: "/driver/v1/locations",
+                byId: (id: string) => `/driver/v1/locations/${id}`,
+            },
+        },
+        driverAppConfig: {
+            base: "/api/v1/driver-app-config",
         }
     }
 }

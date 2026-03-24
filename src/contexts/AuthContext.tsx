@@ -2,14 +2,12 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { AUTH_CONFIG } from '@/constants/constants';
-import { User, Tenant } from '@/types';
-import { authService } from '@/services/auth.service';
+import { DRIVER_AUTH_CONFIG, FRONTEND_ROUTES } from '@/constants/constants';
+import { Driver, driverService } from '@/services/driver.service';
 import { toast } from 'sonner';
 
 interface AuthContextType {
-  user: User | null;
-  tenant: Tenant | null;
+  user: Driver | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
   logout: () => void;
@@ -18,7 +16,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
-  tenant: null,
   loading: true,
   login: async () => {},
   logout: () => {},
@@ -28,8 +25,7 @@ const AuthContext = createContext<AuthContextType>({
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [tenant, setTenant] = useState<Tenant | null>(null);
+  const [user, setUser] = useState<Driver | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
 
@@ -40,30 +36,24 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         return;
       }
 
-      const token = localStorage.getItem(AUTH_CONFIG.tokenKey);
-      const storedUser = localStorage.getItem(AUTH_CONFIG.userKey);
-      const storedTenant = localStorage.getItem(AUTH_CONFIG.tenantKey);
+      const token = localStorage.getItem(DRIVER_AUTH_CONFIG.tokenKey);
+      const storedUser = localStorage.getItem(DRIVER_AUTH_CONFIG.userKey);
 
-      if (token && storedUser && storedTenant) {
+      if (token && storedUser) {
         try {
           const userData = JSON.parse(storedUser);
-          const tenantData = JSON.parse(storedTenant);
           
           // Sync cookies with localStorage for middleware
-          document.cookie = `${AUTH_CONFIG.tokenKey}=${token}; path=/; max-age=86400; SameSite=Lax`;
-          document.cookie = `${AUTH_CONFIG.userKey}=${encodeURIComponent(storedUser)}; path=/; max-age=86400; SameSite=Lax`;
-          document.cookie = `${AUTH_CONFIG.tenantKey}=${encodeURIComponent(storedTenant)}; path=/; max-age=86400; SameSite=Lax`;
+          document.cookie = `${DRIVER_AUTH_CONFIG.tokenKey}=${token}; path=/; max-age=86400; SameSite=Lax`;
+          document.cookie = `${DRIVER_AUTH_CONFIG.userKey}=${encodeURIComponent(storedUser)}; path=/; max-age=86400; SameSite=Lax`;
           
           setUser(userData);
-          setTenant(tenantData);
         } catch (error) {
           console.error('Error parsing stored auth data:', error);
-          localStorage.removeItem(AUTH_CONFIG.tokenKey);
-          localStorage.removeItem(AUTH_CONFIG.userKey);
-          localStorage.removeItem(AUTH_CONFIG.tenantKey);
-          document.cookie = `${AUTH_CONFIG.tokenKey}=; path=/; max-age=0`;
-          document.cookie = `${AUTH_CONFIG.userKey}=; path=/; max-age=0`;
-          document.cookie = `${AUTH_CONFIG.tenantKey}=; path=/; max-age=0`;
+          localStorage.removeItem(DRIVER_AUTH_CONFIG.tokenKey);
+          localStorage.removeItem(DRIVER_AUTH_CONFIG.userKey);
+          document.cookie = `${DRIVER_AUTH_CONFIG.tokenKey}=; path=/; max-age=0`;
+          document.cookie = `${DRIVER_AUTH_CONFIG.userKey}=; path=/; max-age=0`;
         }
       }
       
@@ -75,22 +65,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const login = async (email: string, password: string) => {
     try {
-      const { access_token, user, tenant } = await authService.login(email, password);
+      const { token, driver } = await driverService.login(email, password);
 
       // Set localStorage for client-side access
-      localStorage.setItem(AUTH_CONFIG.tokenKey, access_token);
-      localStorage.setItem(AUTH_CONFIG.userKey, JSON.stringify(user));
-      localStorage.setItem(AUTH_CONFIG.tenantKey, JSON.stringify(tenant));
+      localStorage.setItem(DRIVER_AUTH_CONFIG.tokenKey, token);
+      localStorage.setItem(DRIVER_AUTH_CONFIG.userKey, JSON.stringify(driver));
 
       // Set cookies for middleware access
-      document.cookie = `${AUTH_CONFIG.tokenKey}=${access_token}; path=/; max-age=86400; SameSite=Lax`;
-      document.cookie = `${AUTH_CONFIG.userKey}=${encodeURIComponent(JSON.stringify(user))}; path=/; max-age=86400; SameSite=Lax`;
-      document.cookie = `${AUTH_CONFIG.tenantKey}=${encodeURIComponent(JSON.stringify(tenant))}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `${DRIVER_AUTH_CONFIG.tokenKey}=${token}; path=/; max-age=86400; SameSite=Lax`;
+      document.cookie = `${DRIVER_AUTH_CONFIG.userKey}=${encodeURIComponent(JSON.stringify(driver))}; path=/; max-age=86400; SameSite=Lax`;
 
-      setUser(user);
-      setTenant(tenant);
+      setUser(driver);
       toast.success('Login successful!');
-      router.push('/dashboard');
+      router.push(FRONTEND_ROUTES.DRIVER_DASHBOARD);
     } catch (error) {
       console.error('Login error:', error);
       throw error;
@@ -99,26 +86,22 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const logout = () => {
     // Clear localStorage
-    localStorage.removeItem(AUTH_CONFIG.tokenKey);
-    localStorage.removeItem(AUTH_CONFIG.userKey);
-    localStorage.removeItem(AUTH_CONFIG.tenantKey);
+    localStorage.removeItem(DRIVER_AUTH_CONFIG.tokenKey);
+    localStorage.removeItem(DRIVER_AUTH_CONFIG.userKey);
     
     // Clear cookies
-    document.cookie = `${AUTH_CONFIG.tokenKey}=; path=/; max-age=0`;
-    document.cookie = `${AUTH_CONFIG.userKey}=; path=/; max-age=0`;
-    document.cookie = `${AUTH_CONFIG.tenantKey}=; path=/; max-age=0`;
+    document.cookie = `${DRIVER_AUTH_CONFIG.tokenKey}=; path=/; max-age=0`;
+    document.cookie = `${DRIVER_AUTH_CONFIG.userKey}=; path=/; max-age=0`;
     
     setUser(null);
-    setTenant(null);
     toast.info('You have been logged out.');
-    router.push('/login');
+    router.push(FRONTEND_ROUTES.DRIVER_LOGIN || '/login');
   };
 
   return (
     <AuthContext.Provider
       value={{
         user,
-        tenant,
         loading,
         login,
         logout,

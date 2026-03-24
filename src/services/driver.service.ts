@@ -1,5 +1,6 @@
 import driverHttpService from '@/lib/driver-http-service';
-import { API_CONFIG } from '@/constants/constants';
+import { API_CONFIG, DRIVER_AUTH_CONFIG } from '@/constants/constants';
+import { Station, Location } from '@/types';
 
 export interface Driver {
   id: string;
@@ -168,15 +169,29 @@ class DriverService {
       API_CONFIG.endpoints.driver.charging.activeSession
     );
   }
+  
+  async getStations(params?: { name?: string; locationId?: string }): Promise<Station[]> {
+    return driverHttpService.get<Station[]>(
+      API_CONFIG.endpoints.driver.stations.base,
+      { params }
+    );
+  }
+
+  async getLocations(params?: { name?: string }): Promise<Location[]> {
+    return driverHttpService.get<Location[]>(
+      API_CONFIG.endpoints.driver.locations.base,
+      { params }
+    );
+  }
 
   async logout(): Promise<void> {
     if (typeof window !== 'undefined') {
-      localStorage.removeItem('driver_auth_token');
-      localStorage.removeItem('driver_user');
+      localStorage.removeItem(DRIVER_AUTH_CONFIG.tokenKey);
+      localStorage.removeItem(DRIVER_AUTH_CONFIG.userKey);
       
       // Clear cookies
-      document.cookie = 'driver_auth_token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
-      document.cookie = 'driver_user=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      document.cookie = `${DRIVER_AUTH_CONFIG.tokenKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
+      document.cookie = `${DRIVER_AUTH_CONFIG.userKey}=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
     }
   }
 }

@@ -1,8 +1,10 @@
 'use client';
 
 import { useState } from 'react';
-import { useDriverProfile, useDriverRfidCards, useDriverTransactions } from '@/hooks/get/useDriverProfile';
-import { useRemoveRfidCard } from '@/hooks/post/useDriverProfileMutations';
+import { useProfile } from '@/hooks/get/use-profile';
+import { useRfidCards } from '@/hooks/get/use-rfid-cards';
+import { useTransactions } from '@/hooks/get/use-transactions';
+import { useRemoveRfidCard } from '@/hooks/post/use-remove-rfid-card';
 import { DriverProfileCard } from '../components/DriverProfileCard';
 import { RfidCardList } from '../components/RfidCardList';
 import { TransactionList } from '../components/TransactionList';
@@ -11,9 +13,9 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
 export function DriverProfileContainer() {
-  const { data: driver, isLoading: isLoadingProfile, error: profileError } = useDriverProfile();
-  const { data: rfidCards = [], isLoading: isLoadingCards } = useDriverRfidCards();
-  const { data: transactions = [], isLoading: isLoadingTransactions } = useDriverTransactions();
+  const { data: driver, isLoading: isLoadingProfile, error: profileError } = useProfile();
+  const { data: rfidCards = [], isLoading: isLoadingCards } = useRfidCards();
+  const { data: transactions = [], isLoading: isLoadingTransactions } = useTransactions();
   const removeCardMutation = useRemoveRfidCard();
 
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);

@@ -11,7 +11,7 @@ export function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (!loading && !isAuthenticated) {
-      router.push(FRONTEND_ROUTES.LOGIN);
+      router.push(FRONTEND_ROUTES.DRIVER_LOGIN);
     }
   }, [isAuthenticated, loading, router]);
 

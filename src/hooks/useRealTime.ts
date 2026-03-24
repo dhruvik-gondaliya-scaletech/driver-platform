@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import realTimeService, { EventListener } from '@/lib/realtime.service';
-import { AUTH_CONFIG } from '@/constants/constants';
+import { DRIVER_AUTH_CONFIG } from '@/constants/constants';
 
 /**
  * A hook to facilitate using the real-time WebSocket service in components.
@@ -34,7 +34,7 @@ export function useWebSocketConnection(deps: React.DependencyList = []): void {
     useEffect(() => {
         if (typeof window === 'undefined') return;
 
-        const token = localStorage.getItem(AUTH_CONFIG.tokenKey);
+        const token = localStorage.getItem(DRIVER_AUTH_CONFIG.tokenKey);
         if (!token) {
             console.warn(
                 'No authentication token found. Cannot connect to WebSocket.',

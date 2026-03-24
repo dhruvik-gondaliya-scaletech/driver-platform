@@ -1,11 +1,11 @@
 'use client';
 
 import { DriverLoginForm } from '../components/DriverLoginForm';
-import { useDriverLogin } from '@/hooks/post/useDriverAuthMutations';
+import { useLogin } from '@/hooks/post/use-login';
 import { DriverLoginInput } from '@/lib/validations/driver-auth.schema';
 
 export function DriverLoginContainer() {
-  const loginMutation = useDriverLogin();
+  const loginMutation = useLogin();
 
   const handleSubmit = async (data: DriverLoginInput) => {
     await loginMutation.mutateAsync(data);

@@ -33,7 +33,7 @@ const navItems = [
   { href: FRONTEND_ROUTES.DASHBOARD, label: 'Dashboard', icon: LayoutDashboard, roles: ['user', 'admin', 'super_admin'] },
   { href: FRONTEND_ROUTES.STATIONS, label: 'Stations', icon: Zap, roles: ['user', 'admin', 'super_admin'] },
   { href: FRONTEND_ROUTES.LOCATIONS, label: 'Locations', icon: MapPin, roles: ['user', 'admin', 'super_admin'] },
-  { href: FRONTEND_ROUTES.USERS, label: 'Users', icon: Users, roles: ['user', 'admin', 'super_admin'] },
+  { href: (FRONTEND_ROUTES as any).USERS || '#', label: 'Users', icon: Users, roles: ['user', 'admin', 'super_admin'] },
   { href: FRONTEND_ROUTES.WEBHOOKS, label: 'Webhooks', icon: Webhook, roles: ['user', 'admin', 'super_admin'] },
   { href: '/driver-app-config', label: 'Driver App', icon: Car, roles: ['admin', 'super_admin'] },
   // { href: FRONTEND_ROUTES.OCPI, label: 'OCPI', icon: Share2, roles: ['admin', 'super_admin'] },
@@ -51,8 +51,8 @@ export function Sidebar() {
   };
 
   const canAccessRoute = (requiredRoles: string[]) => {
-    if (!user?.role) return false;
-    return requiredRoles.includes(user.role);
+    if (!(user as any)?.role) return false;
+    return requiredRoles.includes((user as any).role);
   };
 
   return (
@@ -107,14 +107,14 @@ export function Sidebar() {
                   {user?.firstName} {user?.lastName}
                 </p>
                 <p className="text-xs text-muted-foreground truncate">
-                  {user?.role?.replace('_', ' ')}
+                  {(user as any)?.role?.replace('_', ' ')}
                 </p>
               </div>
             </button>
           </PopoverTrigger>
           <PopoverContent className="w-64 p-2 rounded-2xl" side="right" align="end" sideOffset={12}>
             <div className="space-y-1">
-              <Link href={FRONTEND_ROUTES.PROFILE}>
+              <Link href={(FRONTEND_ROUTES as any).PROFILE || '#'}>
                 <button className="flex items-center gap-3 w-full px-3 py-2 rounded-lg hover:bg-accent transition-colors text-sm font-medium text-left">
                   <User className="h-4 w-4" />
                   View Profile

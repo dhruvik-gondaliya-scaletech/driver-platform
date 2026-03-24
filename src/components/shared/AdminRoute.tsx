@@ -10,7 +10,7 @@ export function AdminRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && (!isAuthenticated || !user || !isAdmin(user.role))) {
+    if (!loading && (!isAuthenticated || !user || !isAdmin((user as any).role))) {
       router.push('/dashboard');
     }
   }, [isAuthenticated, loading, user, router]);
@@ -23,7 +23,7 @@ export function AdminRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthenticated || !user || !isAdmin(user.role)) {
+  if (!isAuthenticated || !user || !isAdmin((user as any).role)) {
     return null;
   }
 
@@ -35,7 +35,7 @@ export function SuperAdminRoute({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   useEffect(() => {
-    if (!loading && (!isAuthenticated || !user || !isSuperAdmin(user.role))) {
+    if (!loading && (!isAuthenticated || !user || !isSuperAdmin((user as any).role))) {
       router.push('/dashboard');
     }
   }, [isAuthenticated, loading, user, router]);
@@ -48,7 +48,7 @@ export function SuperAdminRoute({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!isAuthenticated || !user || !isSuperAdmin(user.role)) {
+  if (!isAuthenticated || !user || !isSuperAdmin((user as any).role)) {
     return null;
   }
 

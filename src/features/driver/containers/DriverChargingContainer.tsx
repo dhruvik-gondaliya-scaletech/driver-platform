@@ -1,7 +1,7 @@
 'use client';
 
-import { useDriverActiveSession } from '@/hooks/get/useDriverCharging';
-import { useStopCharging } from '@/hooks/post/useDriverChargingMutations';
+import { useActiveSession } from '@/hooks/get/use-active-session';
+import { useStopCharging } from '@/hooks/post/use-stop-charging';
 import { ActiveSessionCard } from '../components/ActiveSessionCard';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -9,7 +9,7 @@ import { AlertCircle, Zap } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 export function DriverChargingContainer() {
-  const { data: activeSession, isLoading, error } = useDriverActiveSession();
+  const { data: activeSession, isLoading, error } = useActiveSession();
   const stopChargingMutation = useStopCharging();
 
   if (error) {

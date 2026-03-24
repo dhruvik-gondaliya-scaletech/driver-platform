@@ -1,11 +1,11 @@
 'use client';
 
 import { DriverRegisterForm } from '../components/DriverRegisterForm';
-import { useDriverRegister } from '@/hooks/post/useDriverAuthMutations';
+import { useRegister } from '@/hooks/post/use-register';
 import { DriverRegisterInput } from '@/lib/validations/driver-auth.schema';
 
 export function DriverRegisterContainer() {
-  const registerMutation = useDriverRegister();
+  const registerMutation = useRegister();
 
   const handleSubmit = async (data: DriverRegisterInput) => {
     const { confirmPassword, ...registerData } = data;

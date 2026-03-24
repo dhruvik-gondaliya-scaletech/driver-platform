@@ -19,14 +19,30 @@ class DriverHttpService {
       (config) => {
         if (typeof window !== 'undefined') {
           const token = localStorage.getItem(DRIVER_AUTH_CONFIG.tokenKey);
+          const url = config.url || '';
           
           if (token) {
+            console.log(`[DriverHttp] Token found for request to: ${url}`);
             if (this.isTokenExpired(token)) {
+              console.warn(`[DriverHttp] Token expired for request to: ${url}. Clearing session.`);
               this.handleExpiredToken();
               return config;
             }
             
-            config.headers.Authorization = `Bearer ${token}`;
+            // Ensure headers object exists and set Authorization robustly
+            if (config.headers) {
+              const bearerValue = `Bearer ${token}`;
+              if (typeof (config.headers as any).set === 'function') {
+                (config.headers as any).set('Authorization', bearerValue);
+              } else {
+                config.headers.Authorization = bearerValue;
+              }
+              console.log(`[DriverHttp] Authorization header set for: ${url}`);
+            } else {
+              console.warn(`[DriverHttp] Config headers missing for: ${url}`);
+            }
+          } else {
+            console.warn(`[DriverHttp] No token found in localStorage for request to: ${url}`);
           }
         }
         return config;
@@ -43,8 +59,17 @@ class DriverHttpService {
       },
       (error) => {
         if (error.response?.status === 401) {
-          if (typeof window !== 'undefined') {
+          const url = error.config?.url || '';
+          console.error(`[DriverHttp] 401 Unauthorized for: ${url}. Status text: ${error.response.statusText}`);
+          
+          // Don't clear session if it's a public route or specific driver config endpoint
+          const isPublicRoute = url.includes('/api/v1/driver-app-config') || 
+                               url.includes('/driver/v1/auth/');
+          
+          if (!isPublicRoute && typeof window !== 'undefined') {
             this.handleUnauthorized();
+          } else if (isPublicRoute) {
+            console.warn(`[DriverHttp] 401 on public route ${url}. Skipping session clear.`);
           }
         }
         return Promise.reject(error);
@@ -53,12 +78,43 @@ class DriverHttpService {
   }
 
   private isTokenExpired(token: string): boolean {
+    if (!token || !token.includes('.')) return false; // Don't clear if not a JWT or missing
     try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
+      const parts = token.split('.');
+      if (parts.length !== 3) return false;
+
+      const base64Url = parts[1];
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+      
+      // Add padding if necessary for atob
+      const pad = base64.length % 4;
+      let paddedBase64 = base64;
+      if (pad) {
+        if (pad === 2) paddedBase64 += '==';
+        else if (pad === 3) paddedBase64 += '=';
+      }
+
+      const jsonPayload = decodeURIComponent(
+        atob(paddedBase64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      );
+      const payload = JSON.parse(jsonPayload);
+      
+      if (!payload.exp) return false; // If no exp claim, assume it's not expired yet
+
       const expirationTime = payload.exp * 1000;
-      return Date.now() >= expirationTime;
-    } catch {
-      return true;
+      const isExpired = Date.now() >= expirationTime;
+      
+      if (isExpired) {
+        console.warn('Token exp claim reached:', new Date(expirationTime).toISOString());
+      }
+      
+      return isExpired;
+    } catch (error) {
+      console.error('Error checking token expiration (suppressed):', error);
+      return false; // Better to return false and let the request fail than to clear potentially good session
     }
   }
 
@@ -67,8 +123,8 @@ class DriverHttpService {
       localStorage.removeItem(DRIVER_AUTH_CONFIG.tokenKey);
       localStorage.removeItem(DRIVER_AUTH_CONFIG.userKey);
       
-      if (window.location.pathname !== '/driver/login') {
-        window.location.href = '/driver/login?expired=true';
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login?expired=true';
       }
     }
   }
@@ -78,8 +134,8 @@ class DriverHttpService {
       localStorage.removeItem(DRIVER_AUTH_CONFIG.tokenKey);
       localStorage.removeItem(DRIVER_AUTH_CONFIG.userKey);
       
-      if (window.location.pathname !== '/driver/login') {
-        window.location.href = '/driver/login';
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
       }
     }
   }

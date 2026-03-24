@@ -1,4 +1,4 @@
-import httpService from '@/lib/http-service';
+import driverHttpService from '@/lib/driver-http-service';
 import { API_CONFIG } from '@/constants/constants';
 
 export interface DriverAppConfig {
@@ -81,17 +81,12 @@ export interface UpdateDriverAppConfigData {
 class DriverAppConfigService {
   async getConfig(): Promise<DriverAppConfig> {
     try {
-      console.log('Fetching driver app config from /api/v1/driver-app-config');
-      const config = await httpService.get<DriverAppConfig>('/api/v1/driver-app-config');
+      console.log('Fetching driver app config');
+      const config = await driverHttpService.get<DriverAppConfig>(API_CONFIG.endpoints.driverAppConfig.base);
       console.log('Driver app config response:', config);
       return config;
     } catch (error: any) {
-      console.error('Driver app config fetch error:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-      });
+      console.error('Driver app config fetch error:', error);
       throw error;
     }
   }
@@ -99,15 +94,11 @@ class DriverAppConfigService {
   async updateConfig(data: UpdateDriverAppConfigData): Promise<DriverAppConfig> {
     try {
       console.log('Updating driver app config:', data);
-      const config = await httpService.put<DriverAppConfig>('/api/v1/driver-app-config', data);
+      const config = await driverHttpService.put<DriverAppConfig>(API_CONFIG.endpoints.driverAppConfig.base, data);
       console.log('Driver app config update response:', config);
       return config;
     } catch (error: any) {
-      console.error('Driver app config update error:', {
-        message: error.message,
-        response: error.response?.data,
-        status: error.response?.status,
-      });
+      console.error('Driver app config update error:', error);
       throw error;
     }
   }

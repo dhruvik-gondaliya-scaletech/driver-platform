@@ -24,7 +24,7 @@ import {
 } from '@/components/ui/popover';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { AnimatedModal } from './AnimatedModal';
-import { useDriverLogout } from '@/hooks/post/useDriverAuthMutations';
+import { useLogout } from '@/hooks/post/use-logout';
 import { Driver } from '@/services/driver.service';
 import { useConfig } from '@/contexts/ConfigContext';
 import { PricingModel } from '@/services/config.service';
@@ -35,7 +35,7 @@ export function DriverSidebar() {
   const [driver, setDriver] = React.useState<Driver | null>(null);
   const pathname = usePathname();
   const router = useRouter();
-  const logoutMutation = useDriverLogout();
+  const logoutMutation = useLogout();
 
   React.useEffect(() => {
     if (typeof window !== 'undefined') {

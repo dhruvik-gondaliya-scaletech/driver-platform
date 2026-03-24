@@ -1,13 +1,13 @@
 'use client';
 
-import { useDriverSessions } from '@/hooks/get/useDriverCharging';
+import { useSessions } from '@/hooks/get/use-sessions';
 import { SessionHistoryList } from '../components/SessionHistoryList';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle } from 'lucide-react';
 
 export function DriverSessionsContainer() {
-  const { data: sessions = [], isLoading, error } = useDriverSessions();
+  const { data: sessions = [], isLoading, error } = useSessions();
 
   if (error) {
     return (

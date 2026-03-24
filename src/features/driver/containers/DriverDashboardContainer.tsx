@@ -1,11 +1,14 @@
 'use client';
 
-import { useDriverProfile } from '@/hooks/get/useDriverProfile';
-import { useDriverSessions, useDriverActiveSession } from '@/hooks/get/useDriverCharging';
-import { useDriverTransactions } from '@/hooks/get/useDriverProfile';
+import { useProfile } from '@/hooks/get/use-profile';
+import { useSessions } from '@/hooks/get/use-sessions';
+import { useActiveSession } from '@/hooks/get/use-active-session';
+import { useTransactions } from '@/hooks/get/use-transactions';
+import { useStations } from '@/hooks/get/use-stations';
 import { DashboardStatsCard } from '../components/DashboardStatsCard';
 import { ActiveSessionCard } from '../components/ActiveSessionCard';
-import { useStopCharging } from '@/hooks/post/useDriverChargingMutations';
+import { StationList } from '../components/StationList';
+import { useStopCharging } from '@/hooks/post/use-stop-charging';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { AlertCircle, Wallet, Zap, History, Award } from 'lucide-react';
@@ -16,10 +19,11 @@ import { PricingModel } from '@/services/config.service';
 
 export function DriverDashboardContainer() {
   const { config } = useConfig();
-  const { data: driver, isLoading: isLoadingProfile } = useDriverProfile();
-  const { data: sessions = [], isLoading: isLoadingSessions } = useDriverSessions();
-  const { data: activeSession } = useDriverActiveSession();
-  const { data: transactions = [] } = useDriverTransactions();
+  const { data: driver, isLoading: isLoadingProfile } = useProfile();
+  const { data: sessions = [], isLoading: isLoadingSessions } = useSessions();
+  const { data: activeSession } = useActiveSession();
+  const { data: transactions = [] } = useTransactions();
+  const { data: stations = [], isLoading: isLoadingStationsData } = useStations();
   const stopChargingMutation = useStopCharging();
 
   if (isLoadingProfile || isLoadingSessions) {
@@ -113,23 +117,24 @@ export function DriverDashboardContainer() {
           isStopping={stopChargingMutation.isPending}
         />
       ) : (
-        <Card>
-          <CardHeader>
-            <CardTitle>No Active Session</CardTitle>
-            <CardDescription>Start charging at any of our stations</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-muted">
-                <Zap className="h-8 w-8 text-muted-foreground" />
-              </div>
-              <h3 className="mb-2 font-semibold">Ready to Charge</h3>
-              <p className="text-sm text-muted-foreground">
-                Find a station near you and start your charging session
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="grid gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Available Charging Stations</CardTitle>
+              <CardDescription>Find a station and start your session</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <StationList 
+                stations={stations} 
+                isLoading={isLoadingStationsData} 
+                onSelect={(station) => {
+                  // TODO: Navigate to charging page with stationId
+                  console.log('Selected station:', station.id);
+                }} 
+              />
+            </CardContent>
+          </Card>
+        </div>
       )}
 
       {/* Recent Activity */}

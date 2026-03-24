@@ -10,6 +10,7 @@ export enum ChargingStatus {
   FAULTED = 'Faulted',
   OFFLINE = 'Offline',
   MAINTENANCE = 'Maintenance',
+  OCCUPIED = 'Occupied',
 }
 
 export enum ConnectorType {
