@@ -17,7 +17,7 @@ export default function HistoryPage() {
 
   if (isLoading) {
     return (
-      <div className="p-4 space-y-4">
+      <div className="py-6 space-y-4">
         <Skeleton className="h-8 w-48" />
         {[1, 2, 3, 4, 5].map((i) => (
           <Skeleton key={i} className="h-24 w-full" />
@@ -31,7 +31,7 @@ export default function HistoryPage() {
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="p-4 space-y-6"
+      className="py-6 space-y-6"
     >
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold tracking-tight">Charging History</h1>

@@ -1,12 +1,13 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Search, Zap, Loader2, ArrowLeft, QrCode, CreditCard } from "lucide-react";
+import { Search, Zap, Loader2, ArrowLeft, QrCode, CreditCard, MapPin, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useStations, useStation } from "@/hooks/get/use-stations";
+import { useLocations } from "@/hooks/get/use-locations";
 import { useStartCharging } from "@/hooks/post/use-start-charging";
 import { ChargingStatus } from "@/types";
 import { cn } from "@/lib/utils";
@@ -26,6 +27,7 @@ export default function ChargingPage() {
   const { data: stations, isLoading: isStationsLoading } = useStations(
     debouncedSearch ? { name: debouncedSearch } : undefined
   );
+  const { data: locations, isLoading: isLocationsLoading } = useLocations();
   const { data: selectedStation, isLoading: isStationLoading } = useStation(selectedStationId);
   const startCharging = useStartCharging();
 
@@ -39,7 +41,7 @@ export default function ChargingPage() {
   };
 
   return (
-    <div className="p-4 space-y-6 max-w-md mx-auto">
+    <div className="py-6 space-y-6">
       <div className="flex items-center gap-2">
         <Button variant="ghost" size="icon" onClick={() => router.back()}>
           <ArrowLeft className="h-5 w-5" />
@@ -93,6 +95,30 @@ export default function ChargingPage() {
                 </motion.div>
               ))}
               
+              {!searchQuery && locations && locations.length > 0 && (
+                <div className="space-y-3 pt-4">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Nearby Locations</h3>
+                  <div className="grid grid-cols-1 gap-3">
+                    {locations.map((location) => (
+                      <Card key={location.id} className="bg-card/30 border-border/50 hover:bg-accent/50 cursor-pointer transition-colors" onClick={() => setSearchQuery(location.name)}>
+                        <CardContent className="p-4 flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center">
+                              <MapPin className="h-5 w-5 text-muted-foreground" />
+                            </div>
+                            <div>
+                              <p className="font-bold text-sm">{location.name}</p>
+                              <p className="text-xs text-muted-foreground">{location.address}, {location.city}</p>
+                            </div>
+                          </div>
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
+                        </CardContent>
+                      </Card>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               {stations?.length === 0 && searchQuery && (
                 <div className="text-center p-8 text-muted-foreground">
                   No stations found matching "{searchQuery}"

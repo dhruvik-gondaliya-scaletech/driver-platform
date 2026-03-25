@@ -9,12 +9,20 @@ export function AppHeader() {
   return (
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-            <div className="h-4 w-4 bg-background rounded-sm rotate-45" />
-          </div>
-          <span className="text-xl font-bold tracking-tight">Charlie</span>
-        </Link>
+        <div className="flex items-center gap-8">
+          <Link href="/dashboard" className="flex items-center gap-2">
+            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+              <div className="h-4 w-4 bg-background rounded-sm rotate-45" />
+            </div>
+            <span className="text-xl font-bold tracking-tight">Charlie</span>
+          </Link>
+
+          <nav className="hidden sm:flex items-center gap-6">
+            <Link href="/dashboard" className="text-sm font-medium hover:text-primary transition-colors">Dashboard</Link>
+            <Link href="/charging" className="text-sm font-medium hover:text-primary transition-colors">Charging</Link>
+            <Link href="/history" className="text-sm font-medium hover:text-primary transition-colors">History</Link>
+          </nav>
+        </div>
 
         <div className="flex items-center gap-2">
           <Button variant="ghost" size="icon" className="relative">

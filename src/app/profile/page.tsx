@@ -4,17 +4,49 @@ import { useProfile } from "@/hooks/get/use-profile";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { User, Mail, Phone, CreditCard, Shield, LogOut, ChevronRight, Star, Wallet } from "lucide-react";
+import { User, Mail, Phone, CreditCard, Shield, LogOut, ChevronRight, Star, Wallet, Edit2, Loader2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { motion } from "framer-motion";
 import { staggerContainer, staggerItem } from "@/lib/motion";
 import { driverService } from "@/services/driver.service";
 import { useRouter } from "next/navigation";
 import { Separator } from "@/components/ui/separator";
+import { useState, useEffect } from "react";
+import { useUpdateProfile } from "@/hooks/post/use-update-profile";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle, 
+  DialogTrigger,
+  DialogFooter,
+  DialogDescription
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { data: profile, isLoading } = useProfile();
+  const updateProfile = useUpdateProfile();
+  
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [editFormData, setEditFormData] = useState({
+    firstName: "",
+    lastName: "",
+    phoneNumber: ""
+  });
+
+  useEffect(() => {
+    if (profile) {
+      setEditFormData({
+        firstName: profile.firstName || "",
+        lastName: profile.lastName || "",
+        phoneNumber: profile.phoneNumber || ""
+      });
+    }
+  }, [profile]);
 
   const handleLogout = async () => {
     if (confirm("Are you sure you want to logout?")) {
@@ -23,9 +55,16 @@ export default function ProfilePage() {
     }
   };
 
+  const handleUpdateProfile = async (e: React.FormEvent) => {
+    e.preventDefault();
+    updateProfile.mutate(editFormData, {
+      onSuccess: () => setIsEditOpen(false)
+    });
+  };
+
   if (isLoading) {
     return (
-      <div className="p-4 space-y-6">
+      <div className="py-6 space-y-6">
         <Skeleton className="h-24 w-full rounded-2xl" />
         <div className="space-y-4">
           <Skeleton className="h-16 w-full" />
@@ -47,7 +86,7 @@ export default function ProfilePage() {
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="p-4 space-y-6"
+      className="py-6 space-y-6"
     >
       <h1 className="text-2xl font-bold tracking-tight">Account</h1>
 
@@ -62,8 +101,66 @@ export default function ProfilePage() {
                   {profile?.firstName?.[0]}{profile?.lastName?.[0]}
                 </AvatarFallback>
               </Avatar>
-              <div className="space-y-1">
-                <h2 className="text-xl font-bold">{profile?.firstName} {profile?.lastName}</h2>
+              <div className="flex-1 space-y-1">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-xl font-bold">{profile?.firstName} {profile?.lastName}</h2>
+                  <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                    <DialogTrigger asChild>
+                      <Button variant="secondary" size="icon" className="h-8 w-8 bg-white/20 hover:bg-white/30 text-white border-none backdrop-blur-md">
+                        <Edit2 className="h-4 w-4" />
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Profile</DialogTitle>
+                        <DialogDescription>
+                          Update your personal information.
+                        </DialogDescription>
+                      </DialogHeader>
+                      <form onSubmit={handleUpdateProfile} className="space-y-4 pt-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div className="space-y-2">
+                            <Label htmlFor="firstName">First Name</Label>
+                            <Input 
+                              id="firstName" 
+                              value={editFormData.firstName} 
+                              onChange={(e) => setEditFormData({...editFormData, firstName: e.target.value})}
+                              required
+                            />
+                          </div>
+                          <div className="space-y-2">
+                            <Label htmlFor="lastName">Last Name</Label>
+                            <Input 
+                              id="lastName" 
+                              value={editFormData.lastName} 
+                              onChange={(e) => setEditFormData({...editFormData, lastName: e.target.value})}
+                              required
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phone">Phone Number</Label>
+                          <Input 
+                            id="phone" 
+                            type="tel"
+                            value={editFormData.phoneNumber} 
+                            onChange={(e) => setEditFormData({...editFormData, phoneNumber: e.target.value})}
+                          />
+                        </div>
+                        <DialogFooter>
+                          <Button type="submit" disabled={updateProfile.isPending}>
+                            {updateProfile.isPending ? (
+                              <>
+                                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                                Saving...
+                              </>
+                            ) : "Save Changes"}
+                          </Button>
+                        </DialogFooter>
+                      </form>
+                    </DialogContent>
+                  </Dialog>
+                </div>
                 <div className="flex items-center gap-2 text-primary-foreground/70 text-sm">
                   <Mail className="h-3 w-3" />
                   {profile?.email}
@@ -85,11 +182,11 @@ export default function ProfilePage() {
       <motion.div variants={staggerItem} className="grid grid-cols-2 gap-4">
         <div className="p-4 rounded-xl border border-border bg-card/50 space-y-1 text-center">
             <p className="text-[10px] text-muted-foreground uppercase font-bold">Wallet</p>
-            <p className="text-lg font-extrabold text-primary">₹{profile?.walletBalance.toFixed(2)}</p>
+            <p className="text-lg font-extrabold text-primary">₹{(Number(profile?.walletBalance) || 0).toFixed(2)}</p>
         </div>
         <div className="p-4 rounded-xl border border-border bg-card/50 space-y-1 text-center">
             <p className="text-[10px] text-muted-foreground uppercase font-bold">Points</p>
-            <p className="text-lg font-extrabold text-yellow-500">{profile?.loyaltyPoints}</p>
+            <p className="text-lg font-extrabold text-yellow-500">{Number(profile?.loyaltyPoints) || 0}</p>
         </div>
       </motion.div>
 

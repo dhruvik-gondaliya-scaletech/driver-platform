@@ -33,7 +33,7 @@ export default function RootLayout({
       >
         <Providers>
           <AppHeader />
-          <main className="flex-1 pb-20 sm:pb-0">
+          <main className="flex-1 pb-20 sm:pb-0 w-full max-w-3xl mx-auto px-4 sm:px-6">
             <PageTransition>
               {children}
             </PageTransition>

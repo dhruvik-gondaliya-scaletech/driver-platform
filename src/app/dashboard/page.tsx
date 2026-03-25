@@ -21,7 +21,7 @@ export default function DashboardPage() {
 
   if (isLoading) {
     return (
-      <div className="p-4 space-y-4">
+      <div className="py-6 space-y-4">
         <Skeleton className="h-8 w-48" />
         <div className="grid grid-cols-2 gap-4">
           <Skeleton className="h-24 w-full" />
@@ -38,7 +38,7 @@ export default function DashboardPage() {
       variants={staggerContainer}
       initial="initial"
       animate="animate"
-      className="p-4 space-y-6"
+      className="py-6 space-y-6"
     >
       <motion.div variants={staggerItem} className="flex items-center justify-between">
         <div>
