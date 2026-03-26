@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { ChargingSession } from "@/services/driver.service";
 import { useStopCharging } from "@/hooks/post/use-stop-charging";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
 
 interface ActiveSessionBannerProps {
@@ -31,7 +32,7 @@ export function ActiveSessionBanner({ session }: ActiveSessionBannerProps) {
                 <Zap className="h-5 w-5 text-primary animate-pulse" />
                 <motion.div
                   className="absolute inset-0 bg-primary rounded-full"
-                  animate={{ scale: [1, 1.5, 1], opacity: [0.5, 0, 0.5] }}
+                  animate={{ scale: [1, 1.2, 1], opacity: [0.5, 0, 0.5] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 />
               </div>
@@ -46,7 +47,14 @@ export function ActiveSessionBanner({ session }: ActiveSessionBannerProps) {
               variant="outline"
               size="sm"
               className="h-8 text-xs font-bold gap-1.5 border-primary/20 hover:bg-primary/10"
-              onClick={() => router.push(`/charging/${session.id}`)}
+              onClick={() => {
+                const id = session.id || (session as any).sessionId;
+                if (id && id !== 'undefined') {
+                  router.push(`/charging/${id}`);
+                } else {
+                  toast.error("Cannot view details: Invalid session ID");
+                }
+              }}
             >
               Details <ArrowRight className="h-3 w-3" />
             </Button>
@@ -55,11 +63,11 @@ export function ActiveSessionBanner({ session }: ActiveSessionBannerProps) {
           <div className="grid grid-cols-2 gap-3 mb-4">
             <div className="bg-background/50 rounded-lg p-2.5 border border-border/50">
               <p className="text-[10px] text-muted-foreground uppercase font-medium mb-1">Energy</p>
-              <p className="text-lg font-bold leading-none">{session.energyDeliveredKwh.toFixed(2)} <span className="text-[10px] text-muted-foreground">kWh</span></p>
+              <p className="text-lg font-bold leading-none">{Number(session.energyDeliveredKwh || 0).toFixed(2)} <span className="text-[10px] text-muted-foreground">kWh</span></p>
             </div>
             <div className="bg-background/50 rounded-lg p-2.5 border border-border/50">
               <p className="text-[10px] text-muted-foreground uppercase font-medium mb-1">Cost</p>
-              <p className="text-lg font-bold leading-none">₹{session.totalCost?.toFixed(2) || "0.00"}</p>
+              <p className="text-lg font-bold leading-none">₹{Number(session.totalCost || 0).toFixed(2)}</p>
             </div>
           </div>
 
@@ -67,7 +75,14 @@ export function ActiveSessionBanner({ session }: ActiveSessionBannerProps) {
             variant="destructive"
             className="w-full h-10 font-bold gap-2"
             disabled={stopCharging.isPending}
-            onClick={() => stopCharging.mutate(session.id)}
+            onClick={() => {
+              const id = session.id || (session as any).sessionId;
+              if (id && id !== 'undefined') {
+                stopCharging.mutate(id);
+              } else {
+                toast.error("Cannot stop session: Invalid ID");
+              }
+            }}
           >
             <StopCircle className="h-4 w-4" />
             {stopCharging.isPending ? "Stopping..." : "Stop Charging"}

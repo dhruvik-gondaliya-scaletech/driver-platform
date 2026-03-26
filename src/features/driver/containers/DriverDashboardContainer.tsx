@@ -15,9 +15,11 @@ import { AlertCircle, Wallet, Zap, History, Award } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 
 import { useConfig } from '@/contexts/ConfigContext';
-import { PricingModel } from '@/services/config.service';
+import { PricingModel } from '@/types';
+import { useRouter } from 'next/navigation';
 
 export function DriverDashboardContainer() {
+  const router = useRouter();
   const { config } = useConfig();
   const { data: driver, isLoading: isLoadingProfile } = useProfile();
   const { data: sessions = [], isLoading: isLoadingSessions } = useSessions();
@@ -68,7 +70,7 @@ export function DriverDashboardContainer() {
           Welcome back, {driver.firstName}! 👋
         </h2>
         <p className="text-muted-foreground">
-          Here's your charging overview
+          Here&apos;s your charging overview
         </p>
       </div>
 
@@ -128,8 +130,7 @@ export function DriverDashboardContainer() {
                 stations={stations} 
                 isLoading={isLoadingStationsData} 
                 onSelect={(station) => {
-                  // TODO: Navigate to charging page with stationId
-                  console.log('Selected station:', station.id);
+                  router.push(`/charging?stationId=${station.id}`);
                 }} 
               />
             </CardContent>

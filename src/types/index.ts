@@ -317,3 +317,49 @@ export interface PaginatedResponse<T> {
 }
 
 export interface BrandResponse extends PaginatedResponse<Brand> { }
+
+export enum PricingModel {
+  PAY_PER_USE = 'pay_per_use',
+  SUBSCRIPTION = 'subscription',
+  HYBRID = 'hybrid',
+}
+
+export interface DriverAppConfig {
+  id: string;
+  appName: string;
+  logoUrl?: string;
+  primaryColor?: string;
+  accentColor?: string;
+  allowGuestCharging: boolean;
+  allowRfidCharging: boolean;
+  allowAppCharging: boolean;
+  requirePaymentMethod: boolean;
+  pricingModel: PricingModel;
+  energyRate: number;
+  timeRate: number;
+  customDomain?: string;
+  features?: {
+    reservations?: boolean;
+    loyaltyPoints?: boolean;
+    referrals?: boolean;
+    notifications?: boolean;
+  };
+  stripePublishableKey?: string;
+  termsAndConditions?: {
+    url?: string;
+    version?: string;
+    lastUpdated?: string | Date;
+  };
+  privacyPolicy?: {
+    url?: string;
+    version?: string;
+    lastUpdated?: string | Date;
+  };
+  supportContact?: {
+    email?: string;
+    phone?: string;
+    website?: string;
+  };
+  createdAt: string;
+  updatedAt: string;
+}

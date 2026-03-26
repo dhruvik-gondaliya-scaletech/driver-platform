@@ -8,7 +8,12 @@ export function useStopCharging() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (sessionId: string) => driverService.stopCharging(sessionId),
+    mutationFn: (sessionId: string) => {
+      if (!sessionId || sessionId === 'undefined') {
+        throw new Error("Invalid session ID");
+      }
+      return driverService.stopCharging(sessionId);
+    },
     onSuccess: () => {
       toast.success("Charging session stopped successfully");
       queryClient.invalidateQueries({ queryKey: ["driver", "active-session"] });

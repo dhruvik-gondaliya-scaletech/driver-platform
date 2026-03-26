@@ -9,6 +9,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { Label } from '@/components/ui/label';
 import Link from 'next/link';
 import { FRONTEND_ROUTES } from '@/constants/constants';
+import { useConfig } from '@/contexts/ConfigContext';
 
 interface DriverLoginFormProps {
   onSubmit: (data: DriverLoginInput) => Promise<void>;
@@ -16,6 +17,7 @@ interface DriverLoginFormProps {
 }
 
 export function DriverLoginForm({ onSubmit, isLoading }: DriverLoginFormProps) {
+  const { config } = useConfig();
   const {
     register,
     handleSubmit,
@@ -62,6 +64,33 @@ export function DriverLoginForm({ onSubmit, isLoading }: DriverLoginFormProps) {
       <Button type="submit" className="w-full" disabled={isLoading}>
         {isLoading ? 'Signing in...' : 'Sign in'}
       </Button>
+
+      {config?.allowGuestCharging && (
+        <div className="relative my-4">
+          <div className="absolute inset-0 flex items-center">
+            <span className="w-full border-t border-border" />
+          </div>
+          <div className="relative flex justify-center text-xs uppercase">
+            <span className="bg-card px-2 text-muted-foreground">Or</span>
+          </div>
+        </div>
+      )}
+
+      {config?.allowGuestCharging && (
+        <Button 
+          type="button" 
+          variant="outline" 
+          className="w-full" 
+          onClick={() => {
+            // Handle guest login logic here or redirect to guest flow
+            console.log('Continuing as guest');
+            window.location.href = '/dashboard/guest'; // Example path
+          }}
+          disabled={isLoading}
+        >
+          Continue as Guest
+        </Button>
+      )}
 
       <div className="mt-4 text-center text-sm">
         <span className="text-muted-foreground">Don&apos;t have an account? </span>

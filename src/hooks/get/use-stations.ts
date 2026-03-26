@@ -16,9 +16,13 @@ export function useStation(stationId: string | null) {
     queryKey: ["driver", "station", stationId],
     queryFn: async () => {
       if (!stationId) return null;
-      const stations = await driverService.getStations({ name: stationId });
-      // The API might return a list, but we usually look for a specific one by Serial/ID
-      return stations.find(s => s.serialNumber === stationId || s.id === stationId) || null;
+      try {
+        return await driverService.getStationById(stationId);
+      } catch (error) {
+        // Fallback to name search if ID lookup fails (e.g. if stationId is actually a serial number)
+        const stations = await driverService.getStations({ name: stationId });
+        return stations.find(s => s.serialNumber === stationId || s.id === stationId) || null;
+      }
     },
     enabled: !!stationId,
   });

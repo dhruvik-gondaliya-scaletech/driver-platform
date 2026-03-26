@@ -58,8 +58,21 @@ export interface DriverTransaction {
   amount: number;
   status: 'pending' | 'processing' | 'completed' | 'failed' | 'refunded';
   stripePaymentIntentId?: string;
-  metadata?: any;
+  metadata?: Record<string, unknown>;
   createdAt: string;
+}
+
+export interface OcppMeterValue {
+  timestamp: string;
+  sampledValue: {
+    value: string;
+    context?: string;
+    format?: string;
+    measurand?: string;
+    phase?: string;
+    location?: string;
+    unit?: string;
+  }[];
 }
 
 export interface ChargingSession {
@@ -74,13 +87,18 @@ export interface ChargingSession {
   totalCost?: number;
   energyCost?: number;
   timeCost?: number;
+  transactionId?: number;
+  startMeterValue?: number;
   status: 'in-progress' | 'completed' | 'failed';
   paymentStatus?: 'pending' | 'authorized' | 'paid' | 'failed' | 'refunded';
   station?: {
     id: string;
     name: string;
     serialNumber: string;
+    maxPower?: number;
+    model?: string;
   };
+  meterValues?: OcppMeterValue[];
 }
 
 export interface StartChargingData {
@@ -174,6 +192,12 @@ class DriverService {
     return driverHttpService.get<Station[]>(
       API_CONFIG.endpoints.driver.stations.base,
       { params }
+    );
+  }
+
+  async getStationById(id: string): Promise<Station> {
+    return driverHttpService.get<Station>(
+      API_CONFIG.endpoints.driver.stations.byId(id)
     );
   }
 

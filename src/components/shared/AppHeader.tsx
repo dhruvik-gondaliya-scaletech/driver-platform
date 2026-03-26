@@ -4,17 +4,34 @@ import { Bell, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import Link from "next/link";
+import { useConfig } from "@/contexts/ConfigContext";
+import Image from "next/image";
 
 export function AppHeader() {
+  const { config } = useConfig();
+  
   return (
     <header className="sticky top-0 z-40 w-full bg-background/80 backdrop-blur-lg border-b border-border">
       <div className="container flex h-16 items-center justify-between px-4 mx-auto">
         <div className="flex items-center gap-8">
           <Link href="/dashboard" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
-              <div className="h-4 w-4 bg-background rounded-sm rotate-45" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">Charlie</span>
+            {config?.logoUrl ? (
+              <div className="relative h-8 w-8 overflow-hidden rounded-lg">
+                <Image 
+                  src={config.logoUrl} 
+                  alt={config.appName || "Logo"} 
+                  fill 
+                  className="object-contain"
+                />
+              </div>
+            ) : (
+              <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+                <div className="h-4 w-4 bg-background rounded-sm rotate-45" />
+              </div>
+            )}
+            <span className="text-xl font-bold tracking-tight">
+              {config?.appName || "Charlie"}
+            </span>
           </Link>
 
           <nav className="hidden sm:flex items-center gap-6">

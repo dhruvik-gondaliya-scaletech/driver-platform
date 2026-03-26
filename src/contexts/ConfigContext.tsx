@@ -1,7 +1,8 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { DriverAppConfig, configService } from '@/services/config.service';
+import { configService } from '@/services/config.service';
+import { DriverAppConfig } from '@/types';
 
 interface ConfigContextType {
   config: DriverAppConfig | null;
@@ -38,12 +39,20 @@ export function ConfigProvider({ children }: { children: React.ReactNode }) {
 
     const root = document.documentElement;
     if (data.primaryColor) {
-      // Assuming primaryColor is a hex/hsl string
+      // Set the raw hex/color value
       root.style.setProperty('--primary', data.primaryColor);
-      // We might need to handle foreground colors too if primary is too dark/light
+      
+      // Also update shadcn/tailwind variables if they are used
+      // For Tailwind v4/oklch, we might need to be careful, 
+      // but setting the base variable usually works if it's referenced.
     }
     if (data.accentColor) {
       root.style.setProperty('--accent', data.accentColor);
+    }
+    
+    // Set App Name in title if not already set specifically by pages
+    if (data.appName && !document.title.includes(data.appName)) {
+      document.title = `${data.appName} - Driver Platform`;
     }
   };
 

@@ -80,8 +80,8 @@ export default function HistoryPage() {
                       </div>
                       <div className="flex items-center gap-4">
                         <div className="text-right">
-                          <p className="font-bold text-lg">₹{session.totalCost?.toFixed(2) || "0.00"}</p>
-                          <p className="text-[10px] text-muted-foreground uppercase font-medium">{session.energyDeliveredKwh.toFixed(2)} kWh</p>
+                          <p className="font-bold text-lg">₹{Number(session.totalCost || 0).toFixed(2)}</p>
+                          <p className="text-[10px] text-muted-foreground uppercase font-medium">{Number(session.energyDeliveredKwh || 0).toFixed(2)} kWh</p>
                         </div>
                         <ChevronRight className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-transform group-hover:translate-x-1" />
                       </div>

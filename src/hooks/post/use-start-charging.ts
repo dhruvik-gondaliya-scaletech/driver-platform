@@ -11,10 +11,16 @@ export function useStartCharging() {
 
   return useMutation({
     mutationFn: (data: StartChargingData) => driverService.startCharging(data),
-    onSuccess: (session) => {
-      toast.success("Charging session started successfully!");
-      queryClient.invalidateQueries({ queryKey: ["driver", "active-session"] });
-      router.push(`/charging/${session.id}`);
+    onSuccess: (session: any) => {
+      const id = session.id || session.sessionId;
+      if (id && id !== 'undefined') {
+        toast.success("Charging session started successfully!");
+        queryClient.invalidateQueries({ queryKey: ["driver", "active-session"] });
+        router.push(`/charging/${id}`);
+      } else {
+        toast.error("Session started but ID is missing");
+        console.error("Started session data:", session);
+      }
     },
     onError: (error: any) => {
       toast.error(error.message || "Failed to start charging session");

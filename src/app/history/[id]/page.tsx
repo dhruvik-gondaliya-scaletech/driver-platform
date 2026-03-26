@@ -71,7 +71,7 @@ export default function SessionDetailPage() {
             </div>
             <div className="space-y-1">
               <p className="text-xs text-primary-foreground/70 uppercase font-black tracking-widest">Total Energy</p>
-              <h2 className="text-4xl font-black">{session.energyDeliveredKwh.toFixed(2)} <span className="text-xl">kWh</span></h2>
+              <h2 className="text-4xl font-black">{Number(session.energyDeliveredKwh || 0).toFixed(2)} <span className="text-xl">kWh</span></h2>
             </div>
             <Badge variant="secondary" className="bg-white/20 text-white border-none backdrop-blur-md font-bold text-[10px] uppercase">
               {session.status}
@@ -98,7 +98,7 @@ export default function SessionDetailPage() {
               <Zap className="h-3 w-3 text-primary" />
               <p className="text-[10px] font-bold uppercase tracking-wider">Total Cost</p>
             </div>
-            <p className="text-lg font-black text-primary">₹{session.totalCost?.toFixed(2) || "0.00"}</p>
+            <p className="text-lg font-black text-primary">₹{Number(session.totalCost || 0).toFixed(2)}</p>
           </CardContent>
         </Card>
       </motion.div>
